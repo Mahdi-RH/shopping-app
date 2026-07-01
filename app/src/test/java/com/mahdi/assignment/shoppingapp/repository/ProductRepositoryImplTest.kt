@@ -7,6 +7,7 @@ import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.runBlocking
 import com.mahdi.assignment.shoppingapp.core.common.Result
+import kotlinx.coroutines.flow.first
 import org.junit.Before
 import org.junit.Test
 
@@ -23,7 +24,7 @@ class ProductRepositoryImplTest {
 
     @Test
     fun `searchProducts returns success when api succeeds`() = runBlocking {
-        when (val result = repository.searchProducts("test")) {
+        when (val result = repository.searchProducts("test").first()) {
             is Result.Success -> {
                 val data = result.data
                 assertEquals(10, data.products.size)
@@ -36,7 +37,7 @@ class ProductRepositoryImplTest {
     fun `searchProducts returns failure when api fails`() = runBlocking {
         fakeApiService.shouldReturnError = true
 
-        when (val result = repository.searchProducts("test")) {
+        when (val result = repository.searchProducts("test").first()) {
             is Result.Error -> {
                 assertNotNull(result.exception)
             }

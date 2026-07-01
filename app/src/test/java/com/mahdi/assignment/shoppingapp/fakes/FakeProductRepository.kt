@@ -5,6 +5,8 @@ import com.mahdi.assignment.shoppingapp.feature.search.domain.model.SearchResult
 import com.mahdi.assignment.shoppingapp.core.common.Result
 import com.mahdi.assignment.shoppingapp.feature.search.data.remote.toDomain
 import com.mahdi.assignment.shoppingapp.fixtures.ProductFixtures
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class FakeProductRepository : ProductRepository {
 
@@ -17,11 +19,11 @@ class FakeProductRepository : ProductRepository {
         pageCount = 1
     )
 
-    override suspend fun searchProducts(query: String, page: Int): Result<SearchResult> {
-        return if (shouldReturnError) {
-            Result.Error(Exception("Test error"), "Test error")
+    override suspend fun searchProducts(query: String, page: Int): Flow<Result<SearchResult>> = flow {
+        if (shouldReturnError) {
+            emit(Result.Error(Exception("Test error"), "Test error"))
         } else {
-            Result.Success(fakeSearchResult)
+            emit(Result.Success(fakeSearchResult))
         }
     }
 }

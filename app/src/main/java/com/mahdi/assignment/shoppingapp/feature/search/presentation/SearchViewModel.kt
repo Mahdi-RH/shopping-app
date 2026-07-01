@@ -46,10 +46,12 @@ class SearchViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             _uiState.value = SearchUiState.Loading
 
-            when (val result = repository.searchProducts(query)) {
-                is Result.Success -> _uiState.value = SearchUiState.Success(result.data)
-                is Result.Error -> _uiState.value = SearchUiState.Error(result.message ?: "Unknown error")
-                is Result.Loading -> _uiState.value = SearchUiState.Loading
+            repository.searchProducts(query).collect { result ->
+                when (result) {
+                    is Result.Success -> _uiState.value = SearchUiState.Success(result.data)
+                    is Result.Error -> _uiState.value = SearchUiState.Error(result.message ?: "Unknown error")
+                    is Result.Loading -> _uiState.value = SearchUiState.Loading
+                }
             }
         }
     }
