@@ -2,6 +2,8 @@ package com.mahdi.assignment.shoppingapp.core.di
 
 import com.mahdi.assignment.shoppingapp.core.network.ApiService
 import com.mahdi.assignment.shoppingapp.core.network.RetrofitFactory
+import com.mahdi.assignment.shoppingapp.feature.search.data.ProductRepositoryImpl
+import com.mahdi.assignment.shoppingapp.feature.search.domain.ProductRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,5 +28,10 @@ object NetworkModule {
     ): ApiService {
         return retrofit.create(ApiService::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideProductRepository(apiService: ApiService): ProductRepository =
+        ProductRepositoryImpl(apiService)
 
 }
