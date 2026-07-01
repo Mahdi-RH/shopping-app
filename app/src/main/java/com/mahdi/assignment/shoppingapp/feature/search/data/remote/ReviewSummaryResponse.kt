@@ -1,6 +1,6 @@
 package com.mahdi.assignment.shoppingapp.feature.search.data.remote
 
-data class ReviewSummary(
+data class ReviewSummaryResponse(
     val reviewAverage: Double,
     val reviewCount: Int
 )
