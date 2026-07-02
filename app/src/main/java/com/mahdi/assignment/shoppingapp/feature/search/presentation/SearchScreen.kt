@@ -2,7 +2,9 @@ package com.mahdi.assignment.shoppingapp.feature.search.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +32,7 @@ fun SearchScreen(
             viewModel.onSearchQueryChanged(searchQuery)
             viewModel.retry()
         },
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     )
 }
 
@@ -44,7 +46,11 @@ fun SearchScreenContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(Spacing.medium)) {
+    Column(
+        modifier = modifier
+            .padding(Spacing.medium)
+            .imePadding()
+    ) {
         SearchInputField(
             query = searchQuery,
             onQueryChange = onQueryChange
