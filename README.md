@@ -27,13 +27,23 @@ The project follows **Clean Architecture** principles to ensure the code is test
 
 ## Project Structure
 
+```text
 com.mahdi.assignment.shoppingapp
-├── core                # Common UI components, Theme, and Utilities
-├── di                  # Dependency Injection modules (Hilt)
-└── feature_search      # Search & Product feature
-    ├── data            # API models, DTOs, and Repository implementations
-    ├── domain          # Domain models, and Repository interfaces
-    └── presentation    # Composables and ViewModels
+├── core
+│   ├── Common utilities, shared UI components, theme, and helper classes
+│
+├── di
+│   ├── Hilt dependency injection modules
+│
+└── feature/
+    └── search/
+        ├── data/
+        │   ├── Remote data sources, DTOs, API services, and repository implementations
+        ├── domain/
+        │   ├── Business models, and repository interfaces
+        └── presentation/
+            ├── Jetpack Compose screens, UI state, ViewModels, and reusable UI components
+```
 
 
 ## Setup
