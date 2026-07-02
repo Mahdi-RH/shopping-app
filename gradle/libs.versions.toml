@@ -14,6 +14,8 @@ hilt = "2.59"
 ksp = "2.0.21-1.0.28"
 hiltNavigationCompose = "1.3.0"
 coroutines = "1.10.2"
+coil = "2.7.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,7 +44,8 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 #Test
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-
+#Compose
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
