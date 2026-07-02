@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
-import com.mahdi.assignment.shoppingapp.feature.search.domain.model.SearchResult
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,8 +18,7 @@ class SearchScreenTest {
     fun idleState_showsSearchHint() {
         composeTestRule.setContent {
             SearchScreenContent(
-                uiState = SearchUiState.Idle,
-                searchQuery = "",
+                uiState = SearchUiState(),
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},
@@ -56,18 +55,10 @@ class SearchScreenTest {
                 hasNextDayDelivery = false
             )
         )
-        val searchResult = SearchResult(
-            products = products,
-            currentPage = 1,
-            pageSize = 2,
-            totalResults = 2,
-            pageCount = 1
-        )
 
         composeTestRule.setContent {
             SearchScreenContent(
-                uiState = SearchUiState.Success(searchResult),
-                searchQuery = "product",
+                uiState =SearchUiState(products = products, isInitialLoading = false),
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},
@@ -84,8 +75,11 @@ class SearchScreenTest {
         val errorMessage = "Network Error"
         composeTestRule.setContent {
             SearchScreenContent(
-                uiState = SearchUiState.Error(errorMessage),
-                searchQuery = "test",
+                uiState = SearchUiState(
+                    query = "test",
+                    errorMessage = errorMessage,
+                    isInitialLoading = false
+                ),
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},
@@ -102,8 +96,7 @@ class SearchScreenTest {
         var capturedQuery = ""
         composeTestRule.setContent {
             SearchScreenContent(
-                uiState = SearchUiState.Idle,
-                searchQuery = "",
+                uiState = SearchUiState(),
                 onQueryChange = { capturedQuery = it },
                 onRetry = {},
                 onLoadMore = {},

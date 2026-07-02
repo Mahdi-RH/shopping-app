@@ -1,5 +1,6 @@
 package com.mahdi.assignment.shoppingapp.core.di
 
+import com.mahdi.assignment.shoppingapp.core.common.DispatcherProvider
 import com.mahdi.assignment.shoppingapp.core.network.ApiService
 import com.mahdi.assignment.shoppingapp.core.network.RetrofitFactory
 import com.mahdi.assignment.shoppingapp.feature.search.data.ProductRepositoryImpl
@@ -31,7 +32,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideProductRepository(apiService: ApiService): ProductRepository =
-        ProductRepositoryImpl(apiService)
+    fun provideProductRepository(apiService: ApiService, dispatcherProvider: DispatcherProvider): ProductRepository =
+        ProductRepositoryImpl(apiService,dispatcherProvider)
 
 }
