@@ -1,8 +1,10 @@
 package com.mahdi.assignment.shoppingapp.viewmodel
 
+import com.mahdi.assignment.shoppingapp.core.common.DispatcherProvider
 import com.mahdi.assignment.shoppingapp.fakes.FakeProductRepository
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.SearchUiState
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.SearchViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -20,13 +22,19 @@ class SearchViewModelTest {
     private lateinit var fakeRepository: FakeProductRepository
     private lateinit var viewModel: SearchViewModel
     private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcherProvider = object : DispatcherProvider {
+        override val main: CoroutineDispatcher = testDispatcher
+        override val io: CoroutineDispatcher = testDispatcher
+        override val default: CoroutineDispatcher = testDispatcher
+        override val unconfined: CoroutineDispatcher = testDispatcher
+    }
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
         fakeRepository = FakeProductRepository()
-        viewModel = SearchViewModel(fakeRepository)
+        viewModel = SearchViewModel(fakeRepository,testDispatcherProvider)
     }
     @After
     fun tearDown() {
@@ -39,7 +47,7 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `search query triggers Loading then Success`() = runTest {
+    fun `search query return Success state`() = runTest {
         val states = mutableListOf<SearchUiState>()
         val job = backgroundScope.launch {
             viewModel.uiState.toList(states)
@@ -52,7 +60,6 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         assert(states[0] is SearchUiState.Idle)
-       // assert(states.find { it is SearchUiState.Loading } != null)
         assert(states.find { it is SearchUiState.Success } != null)
         job.cancel()
     }

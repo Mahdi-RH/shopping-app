@@ -5,5 +5,5 @@ import com.mahdi.assignment.shoppingapp.core.common.Result
 import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
-    suspend fun searchProducts(query: String, page: Int = 1): Flow<Result<SearchResult>>
+    fun searchProducts(query: String, page: Int = 1): Flow<Result<SearchResult>>
 }

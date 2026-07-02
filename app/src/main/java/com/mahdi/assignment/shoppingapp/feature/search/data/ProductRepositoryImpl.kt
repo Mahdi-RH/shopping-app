@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flowOn
 class ProductRepositoryImpl(
     private val apiService: ApiService
 ) : ProductRepository {
-    override suspend fun searchProducts(query: String, page: Int) = flow {
+    override fun searchProducts(query: String, page: Int) = flow {
         try {
             val response = apiService.searchProducts(query, page)
             emit(Result.Success(response.toDomain()))
