@@ -20,10 +20,34 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
+    SearchScreenContent(
+        uiState = uiState,
+        searchQuery = searchQuery,
+        onQueryChange = viewModel::onSearchQueryChanged,
+        onLoadMore = { viewModel.loadNextPage() },
+        onRetryLoadMore = { viewModel.retryLoadNextPage() },
+        onRetry = {
+            viewModel.onSearchQueryChanged(searchQuery)
+            viewModel.retry()
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SearchScreenContent(
+    uiState: SearchUiState,
+    searchQuery: String,
+    onQueryChange: (String) -> Unit,
+    onLoadMore: () -> Unit,
+    onRetryLoadMore: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier.padding(Spacing.medium)) {
         SearchInputField(
             query = searchQuery,
-            onQueryChange = viewModel::onSearchQueryChanged
+            onQueryChange = onQueryChange
         )
 
         Spacer(Modifier.height(Spacing.medium))
@@ -31,22 +55,18 @@ fun SearchScreen(
         when (uiState) {
             is SearchUiState.Idle -> EmptyState()
             is SearchUiState.Loading -> LoadingState()
-            is SearchUiState.Success ->{
-                val successState = uiState as SearchUiState.Success
+            is SearchUiState.Success -> {
                 ProductList(
-                    products = successState.results.products,
-                    onLoadMore = { viewModel.loadNextPage() },
-                    onRetry = { viewModel.retryLoadNextPage() },
-                    isLoadingMore = successState.isLoadingMore,
-                    isErrorLoadingMore = successState.isErrorLoadingMore
+                    products = uiState.results.products,
+                    onLoadMore = onLoadMore,
+                    onRetry = onRetryLoadMore,
+                    isLoadingMore = uiState.isLoadingMore,
+                    isErrorLoadingMore = uiState.isErrorLoadingMore
                 )
             }
             is SearchUiState.Error -> ErrorState(
-                message = (uiState as SearchUiState.Error).message,
-                onRetry = {
-                    viewModel.onSearchQueryChanged(searchQuery)
-                    viewModel.retry()
-                }
+                message = uiState.message,
+                onRetry = onRetry
             )
         }
     }

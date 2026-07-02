@@ -1,0 +1,118 @@
+package com.mahdi.assignment.shoppingapp.feature.search.presentation
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
+import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
+import com.mahdi.assignment.shoppingapp.feature.search.domain.model.SearchResult
+import org.junit.Rule
+import org.junit.Test
+
+class SearchScreenTest {
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    @Test
+    fun idleState_showsSearchHint() {
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState.Idle,
+                searchQuery = "",
+                onQueryChange = {},
+                onRetry = {},
+                onLoadMore = {},
+                onRetryLoadMore = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText("Start typing to search for products").assertIsDisplayed()
+    }
+
+    @Test
+    fun successState_showsProductList() {
+        val products = listOf(
+            Product(
+                id = 1,
+                name = "Product 1",
+                averageRating = 4.5,
+                reviewCount = 10,
+                USPs = listOf("USP 1"),
+                availabilityState = 1,
+                priceIncludingVat = 100.0,
+                imageUrl = "",
+                hasNextDayDelivery = true
+            ),
+            Product(
+                id = 2,
+                name = "Product 2",
+                averageRating = 4.0,
+                reviewCount = 5,
+                USPs = listOf("USP 2"),
+                availabilityState = 1,
+                priceIncludingVat = 50.0,
+                imageUrl = "",
+                hasNextDayDelivery = false
+            )
+        )
+        val searchResult = SearchResult(
+            products = products,
+            currentPage = 1,
+            pageSize = 2,
+            totalResults = 2,
+            pageCount = 1
+        )
+
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState.Success(searchResult),
+                searchQuery = "product",
+                onQueryChange = {},
+                onRetry = {},
+                onLoadMore = {},
+                onRetryLoadMore = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText("Product 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Product 2").assertIsDisplayed()
+    }
+
+    @Test
+    fun errorState_showsErrorMessageAndRetryButton() {
+        val errorMessage = "Network Error"
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState.Error(errorMessage),
+                searchQuery = "test",
+                onQueryChange = {},
+                onRetry = {},
+                onLoadMore = {},
+                onRetryLoadMore = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText("Error: Network Error").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Retry").assertIsDisplayed()
+    }
+
+    @Test
+    fun typingInSearchField_triggersCallback() {
+        var capturedQuery = ""
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState.Idle,
+                searchQuery = "",
+                onQueryChange = { capturedQuery = it },
+                onRetry = {},
+                onLoadMore = {},
+                onRetryLoadMore = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText("Search products").performTextInput("iphone")
+        
+        assert(capturedQuery == "iphone")
+    }
+}
