@@ -13,6 +13,7 @@ class ProductRepositoryImpl(
 ) : ProductRepository {
     override fun searchProducts(query: String, page: Int) = flow {
         try {
+            emit(Result.Loading)
             val response = apiService.searchProducts(query, page)
             emit(Result.Success(response.toDomain()))
         } catch (e: Exception) {

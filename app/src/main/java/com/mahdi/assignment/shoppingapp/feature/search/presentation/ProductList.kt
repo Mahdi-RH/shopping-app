@@ -25,17 +25,17 @@ fun ProductList(
         modifier = modifier.fillMaxSize(),
         state = listState
     ) {
-        items(products, key ={ product -> product.id}) { product ->
+        items(products, key = { product -> product.id }) { product ->
             ProductCard(product = product)
         }
 
         if (isLoadingMore || isErrorLoadingMore) {
             item {
-                if (isLoadingMore) {
-                    LoadingMoreFooter()
-                } else {
-                    RetryMoreFooter(onRetry)
-                }
+                PaginationFooter(
+                    isLoading = isLoadingMore,
+                    isError = isErrorLoadingMore,
+                    onRetry = { onRetry() }
+                )
             }
         }
     }

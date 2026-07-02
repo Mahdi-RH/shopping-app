@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
 import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 
@@ -20,18 +21,13 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
 
     SearchScreenContent(
         uiState = uiState,
-        searchQuery = searchQuery,
-        onQueryChange = viewModel::onSearchQueryChanged,
+        onQueryChange = viewModel::onQueryChanged,
         onLoadMore = { viewModel.loadNextPage() },
         onRetryLoadMore = { viewModel.retryLoadNextPage() },
-        onRetry = {
-            viewModel.onSearchQueryChanged(searchQuery)
-            viewModel.retry()
-        },
+        onRetry = viewModel::retrySearch,
         modifier = modifier.fillMaxSize()
     )
 }
@@ -39,7 +35,6 @@ fun SearchScreen(
 @Composable
 fun SearchScreenContent(
     uiState: SearchUiState,
-    searchQuery: String,
     onQueryChange: (String) -> Unit,
     onLoadMore: () -> Unit,
     onRetryLoadMore: () -> Unit,
@@ -52,28 +47,37 @@ fun SearchScreenContent(
             .imePadding()
     ) {
         SearchInputField(
-            query = searchQuery,
+            query = uiState.query,
             onQueryChange = onQueryChange
         )
 
         Spacer(Modifier.height(Spacing.medium))
 
-        when (uiState) {
-            is SearchUiState.Idle -> EmptyState()
-            is SearchUiState.Loading -> LoadingState()
-            is SearchUiState.Success -> {
+        when {
+            uiState.isInitialLoading -> {
+                LoadingState()
+            }
+
+            uiState.errorMessage != null -> {
+                ErrorState(
+                    message = uiState.errorMessage,
+                    onRetry = onRetry
+                )
+            }
+
+            uiState.products.isNotEmpty() -> {
                 ProductList(
-                    products = uiState.results.products,
+                    products = uiState.products,
                     onLoadMore = onLoadMore,
                     onRetry = onRetryLoadMore,
                     isLoadingMore = uiState.isLoadingMore,
-                    isErrorLoadingMore = uiState.isErrorLoadingMore
+                    isErrorLoadingMore = uiState.loadMoreError
                 )
             }
-            is SearchUiState.Error -> ErrorState(
-                message = uiState.message,
-                onRetry = onRetry
-            )
+
+            uiState.isIdle -> {
+                EmptyState()
+            }
         }
     }
 }

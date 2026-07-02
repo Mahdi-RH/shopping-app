@@ -9,15 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.mahdi.assignment.shoppingapp.R
+import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
 fun RetryMoreFooter(onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(Spacing.medium),
         contentAlignment = Alignment.Center
     ) {
         Button(onClick = onRetry) {
