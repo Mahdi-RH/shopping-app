@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Shopping App</string>
+    <string name="search_hint">Start typing to search for products</string>
+    <string name="retry_loading_more">Retry loading more</string>
+    <string name="search_products">Search products</string>
+    <string name="error_message_format">Error: %1$s</string>
+    <string name="retry">Retry</string>
 </resources>

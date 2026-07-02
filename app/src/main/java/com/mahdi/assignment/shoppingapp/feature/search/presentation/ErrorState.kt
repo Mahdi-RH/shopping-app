@@ -11,7 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mahdi.assignment.shoppingapp.R
+import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
 fun ErrorState(
@@ -26,10 +29,10 @@ fun ErrorState(
             .padding(16.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Error: $message")
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.error_message_format, message))
+            Spacer(modifier = Modifier.height(Spacing.small))
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(text = stringResource(R.string.retry))
             }
         }
     }

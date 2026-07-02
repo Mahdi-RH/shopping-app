@@ -8,7 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mahdi.assignment.shoppingapp.R
 
 @Composable
 fun RetryMoreFooter(onRetry: () -> Unit) {
@@ -19,7 +21,9 @@ fun RetryMoreFooter(onRetry: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Button(onClick = onRetry) {
-            Text("Retry loading more")
+            Text(
+                text = stringResource(R.string.retry_loading_more)
+            )
         }
     }
 }

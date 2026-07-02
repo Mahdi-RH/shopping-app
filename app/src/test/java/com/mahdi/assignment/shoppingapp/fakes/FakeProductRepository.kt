@@ -19,7 +19,7 @@ class FakeProductRepository : ProductRepository {
         pageCount = 1
     )
 
-    override suspend fun searchProducts(query: String, page: Int): Flow<Result<SearchResult>> = flow {
+    override fun searchProducts(query: String, page: Int): Flow<Result<SearchResult>> = flow {
         if (shouldReturnError) {
             emit(Result.Error(Exception("Test error"), "Test error"))
         } else {

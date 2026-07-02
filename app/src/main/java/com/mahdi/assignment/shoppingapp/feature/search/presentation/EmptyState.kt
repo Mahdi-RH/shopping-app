@@ -6,6 +6,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.mahdi.assignment.shoppingapp.R
 
 @Composable
 fun EmptyState(modifier: Modifier = Modifier) {
@@ -13,7 +15,7 @@ fun EmptyState(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        Text("Start typing to search for products")
+        Text(text = stringResource(R.string.search_hint))
     }
 }
 

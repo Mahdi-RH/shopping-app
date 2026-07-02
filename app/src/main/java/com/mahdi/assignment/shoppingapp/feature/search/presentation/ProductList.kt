@@ -25,23 +25,25 @@ fun ProductList(
         modifier = modifier.fillMaxSize(),
         state = listState
     ) {
-        items(products) { product ->
+        items(products, key ={ product -> product.id}) { product ->
             ProductCard(product = product)
         }
 
-        item {
-            when {
-                isLoadingMore -> LoadingMoreFooter()
-                isErrorLoadingMore -> RetryMoreFooter(onRetry)
+        if (isLoadingMore || isErrorLoadingMore) {
+            item {
+                if (isLoadingMore) {
+                    LoadingMoreFooter()
+                } else {
+                    RetryMoreFooter(onRetry)
+                }
             }
         }
     }
 
-    // Trigger load more when near the list end
-    LaunchedEffect(listState) {
+        LaunchedEffect(listState, products.size) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { index ->
-                if (index != null && index >= products.lastIndex) {
+                if (index != null && index >= products.lastIndex && products.isNotEmpty()) {
                     onLoadMore()
                 }
             }

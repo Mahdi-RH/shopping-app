@@ -8,16 +8,17 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.mahdi.assignment.shoppingapp.ui.theme.Dimens
+import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
 fun LoadingMoreFooter() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(Spacing.medium),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+        CircularProgressIndicator(modifier = Modifier.size(Dimens.footerLoaderSize))
     }
 }

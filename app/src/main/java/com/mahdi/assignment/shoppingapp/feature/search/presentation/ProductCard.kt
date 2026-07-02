@@ -15,25 +15,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
 import coil.compose.AsyncImage
+import com.mahdi.assignment.shoppingapp.ui.theme.Dimens
+import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
 fun ProductCard(product: Product) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(Spacing.small),
         elevation = CardDefaults.cardElevation()
     ) {
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(Spacing.small)) {
             AsyncImage(
                 model = product.imageUrl,
                 contentDescription = product.name,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(Dimens.productImageSize)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Spacing.small))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = product.name,
