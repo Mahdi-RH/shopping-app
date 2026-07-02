@@ -27,11 +27,17 @@ The project follows **Clean Architecture** principles to ensure the code is test
 
 ## Project Structure
 
-text shopping-app ├── feature │   └── search │       ├── data          # DTOs, API Services, Repository Impl │       ├── domain        # Models, Repository Interfaces, Use Cases │       └── presentation  # ViewModels, Composables, UI States ├── core │   ├── theme             # Color, Type, Spacing, Dimens │   └── common            # Shared components and extensions └── di                    # Hilt Dependency Injection Modules
+com.mahdi.assignment.shoppingapp
+├── core                # Common UI components, Theme, and Utilities
+├── di                  # Dependency Injection modules (Hilt)
+└── feature_search      # Search & Product feature
+    ├── data            # API models, DTOs, and Repository implementations
+    ├── domain          # Domain models, and Repository interfaces
+    └── presentation    # Composables and ViewModels
 
 
 ## Setup
 1. Clone the repository.
-2. Open in **Android Studio **.
+2. Open in Android Studio.
 3. Sync Gradle and run on an emulator or device (API 24+).
 
