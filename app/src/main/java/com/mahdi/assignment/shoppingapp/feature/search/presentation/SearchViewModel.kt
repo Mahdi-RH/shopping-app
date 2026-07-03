@@ -45,7 +45,7 @@ class SearchViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun search(query: String) {
+     fun search(query: String) {
         searchJob?.cancel()
         loadMoreJob?.cancel()
 
