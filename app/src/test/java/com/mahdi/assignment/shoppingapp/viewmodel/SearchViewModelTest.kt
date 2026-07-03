@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -59,7 +60,6 @@ class SearchViewModelTest {
 
         viewModel.onQueryChanged("test")
 
-        advanceTimeBy(350)
         advanceUntilIdle()
 
         val finalState = viewModel.uiState.value
@@ -81,7 +81,6 @@ class SearchViewModelTest {
 
         viewModel.onQueryChanged("fail")
 
-        advanceTimeBy(350)
         advanceUntilIdle()
 
         val errorState = states.find { it.errorMessage != null }
@@ -94,7 +93,7 @@ class SearchViewModelTest {
     @Test
     fun `empty query resets state to idle`() = runTest {
         viewModel.onQueryChanged("query")
-        advanceTimeBy(350)
+
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isIdle)
@@ -104,5 +103,48 @@ class SearchViewModelTest {
         val finalState = viewModel.uiState.value
         assertTrue(finalState.isIdle)
         assertTrue(finalState.products.isEmpty())
+    }
+
+    @Test
+    fun `multiple query changes within debounce period only triggers one search`() = runTest {
+        viewModel.onQueryChanged("i")
+        advanceTimeBy(100)
+        viewModel.onQueryChanged("ip")
+        advanceTimeBy(100)
+        viewModel.onQueryChanged("iph")
+
+        advanceUntilIdle()
+
+        assertEquals(1, fakeRepository.searchCallCount)
+    }
+
+    @Test
+    fun `onLoadMore appends products to existing list`() = runTest {
+
+        viewModel.search("initial")
+        advanceUntilIdle()
+        val initialSize = viewModel.uiState.value.products.size
+
+        viewModel.loadNextPage()
+        advanceUntilIdle()
+
+        val finalState = viewModel.uiState.value
+        assertEquals(initialSize + 10, finalState.products.size)
+        assertFalse(finalState.isLoadingMore)
+    }
+
+    @Test
+    fun `load more error preserves existing products`() = runTest {
+
+        viewModel.search("test")
+        advanceUntilIdle()
+
+        fakeRepository.shouldReturnError = true
+        viewModel.loadNextPage()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.products.isNotEmpty())
+        assertTrue(state.loadMoreError)
     }
 }

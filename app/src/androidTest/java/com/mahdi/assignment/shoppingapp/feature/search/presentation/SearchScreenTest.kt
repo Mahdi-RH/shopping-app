@@ -2,6 +2,7 @@ package com.mahdi.assignment.shoppingapp.feature.search.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
@@ -23,12 +24,26 @@ class SearchScreenTest {
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},
-                onRetryLoadMore = {}
-            )
+                onRetryLoadMore = {})
         }
 
         composeTestRule.onNodeWithText("Start typing to search for products").assertIsDisplayed()
     }
+
+    @Test
+    fun loadingState_showsCircularProgressIndicator() {
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState(isInitialLoading = true),
+                onQueryChange = {},
+                onRetry = {},
+                onLoadMore = {},
+                onRetryLoadMore = {})
+        }
+
+        composeTestRule.onNodeWithTag("loading_indicator").assertIsDisplayed()
+    }
+
 
     @Test
     fun successState_showsProductList() {
@@ -43,8 +58,7 @@ class SearchScreenTest {
                 priceIncludingVat = 100.0,
                 imageUrl = "",
                 hasNextDayDelivery = true
-            ),
-            Product(
+            ), Product(
                 id = 2,
                 name = "Product 2",
                 averageRating = 4.0,
@@ -63,8 +77,7 @@ class SearchScreenTest {
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},
-                onRetryLoadMore = {}
-            )
+                onRetryLoadMore = {})
         }
 
         composeTestRule.onNodeWithText("Product 1").assertIsDisplayed()
@@ -77,19 +90,38 @@ class SearchScreenTest {
         composeTestRule.setContent {
             SearchScreenContent(
                 uiState = SearchUiState(
-                    query = "test",
-                    errorMessage = errorMessage,
-                    isInitialLoading = false
-                ),
-                onQueryChange = {},
-                onRetry = {},
-                onLoadMore = {},
-                onRetryLoadMore = {}
-            )
+                query = "test", errorMessage = errorMessage, isInitialLoading = false
+            ), onQueryChange = {}, onRetry = {}, onLoadMore = {}, onRetryLoadMore = {})
         }
 
         composeTestRule.onNodeWithText("Network Error").assertIsDisplayed()
         composeTestRule.onNodeWithText("Retry").assertIsDisplayed()
+    }
+
+    @Test
+    fun paginationError_showsRetryButtonAtBottom() {
+        val products = listOf(
+            Product(
+                id = 1,
+                name = "Product 1",
+                averageRating = 4.5,
+                reviewCount = 10,
+                USPs = listOf("USP 1"),
+                availabilityState = 1,
+                priceIncludingVat = 100.0,
+                imageUrl = "",
+                hasNextDayDelivery = true
+            )
+        )
+
+        composeTestRule.setContent {
+            SearchScreenContent(
+                uiState = SearchUiState(
+                products = products, loadMoreError = true
+            ), onQueryChange = {}, onRetry = {}, onLoadMore = {}, onRetryLoadMore = {})
+        }
+
+        composeTestRule.onNodeWithText("Retry loading more").assertIsDisplayed()
     }
 
     @Test
@@ -101,12 +133,11 @@ class SearchScreenTest {
                 onQueryChange = { capturedQuery = it },
                 onRetry = {},
                 onLoadMore = {},
-                onRetryLoadMore = {}
-            )
+                onRetryLoadMore = {})
         }
 
         composeTestRule.onNodeWithText("Search products").performTextInput("iphone")
-        
+
         assert(capturedQuery == "iphone")
     }
 }
