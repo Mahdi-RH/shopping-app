@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.SearchViewModel
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchEvent
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun SearchScreen(
     modifier: Modifier = Modifier, viewModel: SearchViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
