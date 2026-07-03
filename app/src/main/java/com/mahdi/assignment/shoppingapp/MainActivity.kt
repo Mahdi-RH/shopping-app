@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.mahdi.assignment.shoppingapp.feature.search.presentation.SearchScreen
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.view.SearchScreen
 import com.mahdi.assignment.shoppingapp.ui.theme.ShoppingAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 

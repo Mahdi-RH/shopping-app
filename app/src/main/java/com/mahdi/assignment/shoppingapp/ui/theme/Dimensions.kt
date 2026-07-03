@@ -8,6 +8,7 @@ object Spacing {
     val medium = 16.dp
     val large = 24.dp
     val extraLarge = 32.dp
+    val huge = 80.dp
 }
 
 object Dimens {
@@ -15,4 +16,6 @@ object Dimens {
     val cardElevation = 4.dp
     val footerLoaderSize = 24.dp
     val iconSizeSmall = 24.dp
+
+    val loadingFooterMinHeight = Spacing.huge
 }

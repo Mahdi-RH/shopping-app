@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.mahdi.assignment.shoppingapp.core.common.DispatcherProvider
 import com.mahdi.assignment.shoppingapp.core.common.Result
 import com.mahdi.assignment.shoppingapp.feature.search.domain.ProductRepository
-import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.SearchResult
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchEvent
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -21,127 +22,153 @@ class SearchViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
-    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-    private var currentPage = 1
-    private var totalPages = 1
-    private var isLoadingMore = false
-    private var isErrorLoadingMore = false
-    private val _products = mutableListOf<Product>()
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState = _uiState.asStateFlow()
+    private val _events = MutableSharedFlow<SearchEvent>()
+    val events = _events.asSharedFlow()
+
     private var searchJob: Job? = null
-    private var paginationJob: Job? = null
+    private var loadMoreJob: Job? = null
 
     init {
         observeSearchQuery()
     }
     private fun observeSearchQuery() {
-        _searchQuery
+        uiState
+            .map { it.query }
             .debounce(300)
             .distinctUntilChanged()
             .filter { it.isNotBlank() }
             .onEach { query ->
-                resetPagination()
-                performSearch(query)
+                search(query)
             }
             .launchIn(viewModelScope)
     }
 
-    fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
-        if (query.isBlank()) {
-            clearSearch()
-        }
-    }
-
-    private fun clearSearch() {
-        resetPagination()
-        _uiState.value = SearchUiState.Idle
-    }
-
-    fun retry() {
-        val query = _searchQuery.value
-        if (query.isNotBlank()) {
-            resetPagination()
-            performSearch(query)
-        }
-    }
-
-    private fun resetPagination() {
-        currentPage = 1
-        totalPages = 1
-        _products.clear()
-        isLoadingMore = false
-        isErrorLoadingMore = false
+    private fun search(query: String) {
         searchJob?.cancel()
-        paginationJob?.cancel()
-    }
-    private fun emitSuccessState(data: SearchResult) {
-        _uiState.update {
-            SearchUiState.Success(
-                results = data.copy(products = _products.toList()),
-                isLoadingMore = isLoadingMore,
-                isErrorLoadingMore = isErrorLoadingMore
-            )
-        }
-    }
+        loadMoreJob?.cancel()
 
-    private fun performSearch(query: String) {
-        searchJob?.cancel()
         searchJob = viewModelScope.launch(dispatchers.main) {
-            _uiState.value = SearchUiState.Loading
+            repository.searchProducts(query, page = 1)
+                .collect { result ->
+                    handleSearchResult(result)
+                }
+        }
+    }
 
-            repository.searchProducts(query).collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        _products.clear()
-                        _products.addAll(result.data.products)
+    private fun handleSearchResult(result: Result<SearchResult>) {
+        when (result) {
+            is Result.Loading -> {
+                _uiState.update {
+                    it.copy(
+                        isInitialLoading = true,
+                        errorMessage = null,
+                        products = emptyList(),
+                        currentPage = 1,
+                        totalPages = 1,
+                        loadMoreError = false
+                    )
+                }
+            }
+
+            is Result.Success -> {
+                _uiState.update {
+                    it.copy(
+                        products = result.data.products,
+                        isInitialLoading = false,
+                        errorMessage = null,
+                        currentPage = result.data.currentPage,
                         totalPages = result.data.pageCount
-                        currentPage = result.data.currentPage
-                        emitSuccessState(result.data)
-                    }
-                    is Result.Error -> {
-                        _uiState.value = SearchUiState.Error(result.message ?: "Unknown error")
-                    }
-                    is Result.Loading -> {
-                        _uiState.value = SearchUiState.Loading
-                    }
+                    )
+                }
+            }
+
+            is Result.Error -> {
+                _uiState.update {
+                    it.copy(
+                        isInitialLoading = false,
+                        errorMessage = result.message ?: "Unknown error",
+                        products = emptyList()
+                    )
                 }
             }
         }
     }
 
     fun loadNextPage() {
-        val currentState = _uiState.value
-        if (isLoadingMore || currentPage >= totalPages || currentState !is SearchUiState.Success) return
+        val state = _uiState.value
 
-        isLoadingMore = true
-        isErrorLoadingMore = false
-        emitSuccessState(currentState.results)
-        paginationJob?.cancel()
-        paginationJob = viewModelScope.launch(dispatchers.main) {
-            repository.searchProducts(_searchQuery.value, currentPage + 1).collect { result ->
-                when (result) {
-                    is Result.Success -> {
-                        isLoadingMore = false
-                        currentPage = result.data.currentPage
-                        _products.addAll(result.data.products)
-                        emitSuccessState(result.data)
-                    }
-                    is Result.Error -> {
-                        isLoadingMore = false
-                        isErrorLoadingMore = true
-                        emitSuccessState(currentState.results)
-                    }
-                    is Result.Loading -> {
-                        // Handled by flags
-                    }
-                }
+        if (!state.canLoadMore || state.isInitialLoading || state.loadMoreError) return
+
+        loadMoreJob?.cancel()
+        loadMoreJob = viewModelScope.launch(dispatchers.main) {
+            repository.searchProducts(
+                query = state.query,
+                page = state.currentPage + 1
+            ).collect { result ->
+                handleLoadMoreResult(result)
             }
         }
     }
+
+    private suspend fun handleLoadMoreResult(result: Result<SearchResult>) {
+        when (result) {
+            is Result.Loading -> {
+                _uiState.update {
+                    it.copy(
+                        isLoadingMore = true,
+                        loadMoreError = false
+                    )
+                }
+            }
+
+            is Result.Success -> {
+                _uiState.update {
+                    it.copy(
+                        products = it.products + result.data.products,
+                        isLoadingMore = false,
+                        loadMoreError = false,
+                        currentPage = result.data.currentPage,
+                        totalPages = result.data.pageCount
+                    )
+                }
+            }
+
+            is Result.Error -> {
+                val errorMsg = result.message ?: "Unknown error"
+                _uiState.update { 
+                    it.copy(
+                        isLoadingMore = false, 
+                        loadMoreError = true 
+                    ) 
+                }
+                _events.emit(SearchEvent.ShowError(errorMsg))
+
+            }
+        }
+    }
+
+    fun onQueryChanged(query: String) {
+        _uiState.update {
+            it.copy(
+                query = query,
+                products = if (query.isBlank()) emptyList() else it.products,
+                errorMessage = null,
+                loadMoreError = false,
+                currentPage = if (query.isBlank()) 1 else it.currentPage,
+                totalPages = if (query.isBlank()) 1 else it.totalPages
+            )
+        }
+    }
+
+    fun retrySearch() {
+        val query = _uiState.value.query
+        if (query.isNotBlank()) search(query)
+    }
+
     fun retryLoadNextPage() {
+        _uiState.update { it.copy(loadMoreError = false) }
         loadNextPage()
     }
 }
