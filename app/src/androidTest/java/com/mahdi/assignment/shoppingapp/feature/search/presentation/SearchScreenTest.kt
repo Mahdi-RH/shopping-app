@@ -88,7 +88,7 @@ class SearchScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Error: Network Error").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Network Error").assertIsDisplayed()
         composeTestRule.onNodeWithText("Retry").assertIsDisplayed()
     }
 
