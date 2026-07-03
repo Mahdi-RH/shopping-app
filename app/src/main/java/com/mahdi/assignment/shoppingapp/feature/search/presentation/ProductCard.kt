@@ -1,5 +1,6 @@
 package com.mahdi.assignment.shoppingapp.feature.search.presentation
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,14 +11,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
+import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
 import com.mahdi.assignment.shoppingapp.ui.theme.Dimens
+import com.mahdi.assignment.shoppingapp.ui.theme.PreviewData
+import com.mahdi.assignment.shoppingapp.ui.theme.ShoppingAppTheme
 import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
@@ -62,3 +67,19 @@ fun ProductCard(product: Product) {
         }
     }
 }
+
+@Preview(showBackground = true, name = "Light Mode")
+@Preview(
+    showBackground = true, name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ProductCardPreview() {
+
+
+    ShoppingAppTheme {
+        Surface {
+            ProductCard(product = PreviewData.sampleProduct)
+        }
+    }
+}
+
