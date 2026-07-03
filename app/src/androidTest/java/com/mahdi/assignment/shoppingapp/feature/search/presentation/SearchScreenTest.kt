@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.Product
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.view.SearchScreenContent
 import org.junit.Rule
 import org.junit.Test
 
@@ -58,7 +59,7 @@ class SearchScreenTest {
 
         composeTestRule.setContent {
             SearchScreenContent(
-                uiState =SearchUiState(products = products, isInitialLoading = false),
+                uiState = SearchUiState(products = products, isInitialLoading = false),
                 onQueryChange = {},
                 onRetry = {},
                 onLoadMore = {},

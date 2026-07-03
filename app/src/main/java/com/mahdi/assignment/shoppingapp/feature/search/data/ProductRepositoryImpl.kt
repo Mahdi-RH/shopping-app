@@ -2,6 +2,7 @@ package com.mahdi.assignment.shoppingapp.feature.search.data
 
 import com.mahdi.assignment.shoppingapp.core.common.DispatcherProvider
 import com.mahdi.assignment.shoppingapp.core.network.ApiService
+import com.mahdi.assignment.shoppingapp.core.network.NetworkErrorHandler
 import com.mahdi.assignment.shoppingapp.feature.search.data.remote.toDomain
 import com.mahdi.assignment.shoppingapp.feature.search.domain.ProductRepository
 import com.mahdi.assignment.shoppingapp.core.common.Result
@@ -18,7 +19,8 @@ class ProductRepositoryImpl(
             val response = apiService.searchProducts(query, page)
             emit(Result.Success(response.toDomain()))
         } catch (e: Exception) {
-            emit(Result.Error(e, e.localizedMessage))
+            val errorMessage = NetworkErrorHandler.getErrorMessage(e)
+            emit(Result.Error(e, errorMessage))
         }
     }.flowOn(dispatchers.io)
 }

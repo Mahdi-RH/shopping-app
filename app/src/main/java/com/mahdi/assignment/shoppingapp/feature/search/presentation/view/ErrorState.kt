@@ -1,4 +1,4 @@
-package com.mahdi.assignment.shoppingapp.feature.search.presentation
+package com.mahdi.assignment.shoppingapp.feature.search.presentation.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -33,7 +33,7 @@ fun ErrorState(
             .padding(16.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = stringResource(R.string.error_message_format, message))
+            Text(text = message)
             Spacer(modifier = Modifier.height(Spacing.small))
             Button(onClick = onRetry) {
                 Text(text = stringResource(R.string.retry))

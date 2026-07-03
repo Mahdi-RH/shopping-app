@@ -1,6 +1,7 @@
-package com.mahdi.assignment.shoppingapp.feature.search.presentation
+package com.mahdi.assignment.shoppingapp.feature.search.presentation.view
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +10,20 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.SearchViewModel
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchEvent
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
 import com.mahdi.assignment.shoppingapp.ui.theme.PreviewData
 import com.mahdi.assignment.shoppingapp.ui.theme.ShoppingAppTheme
 import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
@@ -25,6 +31,16 @@ fun SearchScreen(
     modifier: Modifier = Modifier, viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is SearchEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     SearchScreenContent(
         uiState = uiState,
@@ -61,7 +77,7 @@ fun SearchScreenContent(
                 LoadingState()
             }
 
-            uiState.errorMessage != null -> {
+            uiState.products.isEmpty() && uiState.errorMessage != null  -> {
                 ErrorState(
                     message = uiState.errorMessage, onRetry = onRetry
                 )

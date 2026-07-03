@@ -6,6 +6,7 @@ import com.mahdi.assignment.shoppingapp.core.common.DispatcherProvider
 import com.mahdi.assignment.shoppingapp.core.common.Result
 import com.mahdi.assignment.shoppingapp.feature.search.domain.ProductRepository
 import com.mahdi.assignment.shoppingapp.feature.search.domain.model.SearchResult
+import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchEvent
 import com.mahdi.assignment.shoppingapp.feature.search.presentation.model.SearchUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -23,6 +24,8 @@ class SearchViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
+    private val _events = MutableSharedFlow<SearchEvent>()
+    val events = _events.asSharedFlow()
 
     private var searchJob: Job? = null
     private var loadMoreJob: Job? = null
@@ -96,7 +99,7 @@ class SearchViewModel @Inject constructor(
     fun loadNextPage() {
         val state = _uiState.value
 
-        if (!state.canLoadMore || state.isInitialLoading) return
+        if (!state.canLoadMore || state.isInitialLoading || state.loadMoreError) return
 
         loadMoreJob?.cancel()
         loadMoreJob = viewModelScope.launch(dispatchers.main) {
@@ -109,7 +112,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun handleLoadMoreResult(result: Result<SearchResult>) {
+    private suspend fun handleLoadMoreResult(result: Result<SearchResult>) {
         when (result) {
             is Result.Loading -> {
                 _uiState.update {
@@ -133,12 +136,15 @@ class SearchViewModel @Inject constructor(
             }
 
             is Result.Error -> {
-                _uiState.update {
+                val errorMsg = result.message ?: "Unknown error"
+                _uiState.update { 
                     it.copy(
-                        isLoadingMore = false,
-                        loadMoreError = true
-                    )
+                        isLoadingMore = false, 
+                        loadMoreError = true 
+                    ) 
                 }
+                _events.emit(SearchEvent.ShowError(errorMsg))
+
             }
         }
     }
@@ -162,6 +168,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun retryLoadNextPage() {
+        _uiState.update { it.copy(loadMoreError = false) }
         loadNextPage()
     }
 }

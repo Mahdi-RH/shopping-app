@@ -1,4 +1,4 @@
-package com.mahdi.assignment.shoppingapp.feature.search.presentation
+package com.mahdi.assignment.shoppingapp.feature.search.presentation.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth

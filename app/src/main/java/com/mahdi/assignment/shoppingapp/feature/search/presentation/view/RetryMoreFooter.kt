@@ -1,8 +1,10 @@
-package com.mahdi.assignment.shoppingapp.feature.search.presentation
+package com.mahdi.assignment.shoppingapp.feature.search.presentation.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,14 +14,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.mahdi.assignment.shoppingapp.R
 import com.mahdi.assignment.shoppingapp.ui.theme.ShoppingAppTheme
+import com.mahdi.assignment.shoppingapp.ui.theme.Spacing
 
 @Composable
-fun EmptyState(modifier: Modifier = Modifier) {
+fun RetryMoreFooter(onRetry: () -> Unit) {
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Spacing.medium),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = stringResource(R.string.search_hint))
+        Button(onClick = onRetry) {
+            Text(
+                text = stringResource(R.string.retry_loading_more)
+            )
+        }
     }
 }
 
@@ -30,11 +39,10 @@ fun EmptyState(modifier: Modifier = Modifier) {
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun EmptyStatePreview() {
+private fun RetryMoreFooterPreview() {
     ShoppingAppTheme {
         Surface {
-            EmptyState()
+            RetryMoreFooter(onRetry = {})
         }
     }
 }
-
