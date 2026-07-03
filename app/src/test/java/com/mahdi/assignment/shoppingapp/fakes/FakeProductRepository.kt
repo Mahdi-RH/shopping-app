@@ -11,19 +11,25 @@ import kotlinx.coroutines.flow.flow
 class FakeProductRepository : ProductRepository {
 
     var shouldReturnError = false
-    var fakeSearchResult = SearchResult(
+     var searchCallCount = 0
+    private var fakeSearchResult = SearchResult(
         products = ProductFixtures.fakeProducts.map { it.toDomain() },
         currentPage = 1,
         pageSize = 10,
-        totalResults = 0,
-        pageCount = 1
+        totalResults = 20,
+        pageCount = 2
     )
 
     override fun searchProducts(query: String, page: Int): Flow<Result<SearchResult>> = flow {
+        searchCallCount++
         if (shouldReturnError) {
             emit(Result.Error(Exception("Test error"), "Test error"))
         } else {
             emit(Result.Success(fakeSearchResult))
         }
+    }
+
+    fun resetCallCount() {
+        searchCallCount = 0
     }
 }
